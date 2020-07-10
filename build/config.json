@@ -1,0 +1,14 @@
+{
+  "port": 8080,
+  "path": {
+    "public": "/public/"
+  },
+  "dir" :{
+    "common": "common",
+    "chunk": "chunk",
+    "img": "img",
+    "font": "font",
+    "js": "js"
+  },
+  "extensions": "ejs"
+}
