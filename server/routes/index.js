@@ -1,8 +1,9 @@
 const router = require('koa-router')();
 
-router.get('/', async (ctx, next) => {
+router.get('/index', async (ctx, next) => {
+ console.log(ctx.render); 
  console.log(ctx.device);
-  await ctx.render(`${ctx.device}/index`)
+  await ctx.render(`${ctx.device}/test`)
 });
 
 module.exports = router;

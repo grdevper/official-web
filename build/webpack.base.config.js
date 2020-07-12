@@ -4,6 +4,7 @@ const config = require('./config');
 const glob = require('glob');
 const {resolve} = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 
 
 module.exports = {
@@ -106,19 +107,26 @@ module.exports = {
 },
 
     plugins: [
+        new ProgressBarPlugin({
+            format: '编译进度：[:bar] :percent (耗时：:elapsed 秒)',
+            clear: true,
+            width: 60,
+            stream: process.stdout ? process.stdout : undefined,
+        }),
         new webpack.ProvidePlugin({
             $: 'jquery'
         }),
         // 打包文件
-        ...glob.sync(resolve(__dirname, '../client/views/**/*.ejs')).map((filepath, i) => {
+        ...glob.sync(resolve(__dirname, '../client/views/**/pages/**/*.ejs')).map((filepath, i) => {
             const tempList = filepath.split(/[\/|\/\/|\\|\\\\]/g); // eslint-disable-line
             // 读取 CONFIG.EXT 文件自定义的文件后缀名，默认生成 ejs 文件，可以定义生成 html 文件
             const folder = /\/views\/pc\//.test(filepath) ? 'pc' : 'mobile';
             const filename = (name => `${name.split('.')[0]}.${config.extensions}`)(`${config.dir.chunk}/${folder}/${tempList[tempList.length - 1]}`)
             const template = filepath
             const fileChunk = filename.split('.')[0].split(/[\/|\/\/|\\|\\\\]/g).pop() // eslint-disable-line
-            const chunks = isDev ? [ fileChunk ] : ['manifest', 'vendors', fileChunk]
+            const _fileChunk = `${folder}/${fileChunk}`;
+            const chunks = isDev ? [ _fileChunk ] : ['manifest', 'vendors', _fileChunk]
             return new HtmlWebpackPlugin({ filename, template, chunks })
-        })
+        }),
     ]
 };
