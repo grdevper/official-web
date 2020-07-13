@@ -5,7 +5,7 @@ const json = require('koa-json')
 const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser');
 const logger = require('koa-logger')
-const koaStatic = require('koa-static')
+const koaStatic = require('koa-static-server')
 const {resolve} = require('path')
 const index = require('./routes/index');
 const {checkAgent} = require('./util/index');
@@ -18,7 +18,7 @@ const compiler = webpack(webpackConfig)
 const isDev = process.env.NODE_ENV === 'development'
 const port = process.env.port || config.port;
 
-if (!isDev) {
+if (isDev) {
     // 用 webpack-dev-middleware 启动 webpack 编译
     app.use(webpackDevMiddleware(compiler, {
         publicPath: webpackConfig.output.publicPath
@@ -30,13 +30,16 @@ if (!isDev) {
         noInfo: true
     }));
 } else {
-    app.use(views(resolve(__dirname, '../public/chunk/'), {
+    app.use(views(resolve(__dirname, '../public/chunk'), {
         extension: 'ejs'
     }));
 }
-console.log(resolve(__dirname, '../public'))
-app.use(koaStatic(resolve(__dirname, '..', 'public')));
-//app.use(checkAgent)
+
+app.use(bodyparser());
+app.use(json());
+app.use(logger());
+app.use(koaStatic({rootDir: 'public', rootPath: '/public'}));
+app.use(checkAgent)
 app.use(index.routes(), index.allowedMethods());
 
 app.listen(port, () => {
