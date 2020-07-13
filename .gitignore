@@ -1,0 +1,9 @@
+node_modules/
+.idea
+.vscode
+.cache-loader
+public/*
+!public/static
+yarn.lock
+.DS_Store
+**/.DS_Store
